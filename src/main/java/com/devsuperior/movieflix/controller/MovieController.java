@@ -1,0 +1,75 @@
+package com.devsuperior.movieflix.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.devsuperior.movieflix.DTO.MovieDTO;
+import com.devsuperior.movieflix.DTO.MovieSimpleDTO;
+import com.devsuperior.movieflix.DTO.ReviewUserDTO;
+import com.devsuperior.movieflix.entities.User;
+import com.devsuperior.movieflix.services.AuthService;
+import com.devsuperior.movieflix.services.MovieService;
+
+
+@RestController
+@RequestMapping(value = "/movies")
+public class MovieController {
+
+	@Autowired
+	private MovieService service;
+	
+	@Autowired
+	private AuthService authService;
+	
+
+	@GetMapping(value = "/{id}")
+	public ResponseEntity<MovieDTO> findById(@PathVariable Long id) {
+		
+		User user = authService.authenticated();
+		authService.validateSelfOrMemberAndVisitor(user.getId());
+		
+    	MovieDTO dto = service.findById(id);
+			
+		return ResponseEntity.ok().body(dto);
+	}
+	
+	@GetMapping(value = "/{id}/reviews")
+	public ResponseEntity<List<ReviewUserDTO>> findReviews(@PathVariable Long id) {
+	
+		User user = authService.authenticated();
+		authService.validateSelfOrMemberAndVisitor(user.getId());
+
+		List<ReviewUserDTO> list = service.findReviews(id);
+		
+		return ResponseEntity.ok().body(list);
+
+	}
+	
+	
+	@GetMapping
+	public ResponseEntity<Page<MovieSimpleDTO>> findByGenre(@RequestParam("genreId") Long genreId, Pageable pageable ) {
+		
+		User user = authService.authenticated();
+		authService.validateSelfOrMemberAndVisitor(user.getId());
+		
+		Page<MovieSimpleDTO> page;
+		if (genreId == 0) {
+			page = service.findAllPaged(pageable);
+		}else {
+			page = service.findByGenre(genreId, pageable);
+		}			
+		
+		return ResponseEntity.ok().body(page);
+	}	
+	
+}
+
