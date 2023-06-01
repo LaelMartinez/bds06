@@ -38,35 +38,20 @@ public class MovieController {
 		authService.validateSelfOrMemberAndVisitor(user.getId());
 		
     	MovieDTO dto = service.findById(id);
-			
 		return ResponseEntity.ok().body(dto);
 	}
 	
 	@GetMapping(value = "/{id}/reviews")
 	public ResponseEntity<List<ReviewUserDTO>> findReviews(@PathVariable Long id) {
-	
-		User user = authService.authenticated();
-		authService.validateSelfOrMemberAndVisitor(user.getId());
-
 		List<ReviewUserDTO> list = service.findReviews(id);
-		
 		return ResponseEntity.ok().body(list);
-
 	}
 	
 	
 	@GetMapping
-	public ResponseEntity<Page<MovieSimpleDTO>> findByGenre(@RequestParam("genreId") Long genreId, Pageable pageable ) {
-		
-		User user = authService.authenticated();
-		authService.validateSelfOrMemberAndVisitor(user.getId());
-		
-		Page<MovieSimpleDTO> page;
-		if (genreId == 0) {
-			page = service.findAllPaged(pageable);
-		}else {
-			page = service.findByGenre(genreId, pageable);
-		}			
+	public ResponseEntity<Page<MovieSimpleDTO>> findByGenre(@RequestParam(value = "genreId", defaultValue = "0") Long genreId, Pageable pageable ) {
+
+		Page<MovieSimpleDTO> page = service.findByGenre(genreId, pageable); 
 		
 		return ResponseEntity.ok().body(page);
 	}	

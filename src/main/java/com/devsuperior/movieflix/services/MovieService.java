@@ -46,6 +46,8 @@ public class MovieService{
 	public Page<MovieSimpleDTO> findByGenre(Long genreId, Pageable pageable){
 		Genre genre = ( genreId == 0 ) ? null : genreRepository.getOne(genreId); 
 		Page<Movie> page = repository.find(genre, pageable);
+		
+		repository.findMoviesAndGenres(page.getContent());
 		return page.map(x -> new MovieSimpleDTO(x));
 	}	
 

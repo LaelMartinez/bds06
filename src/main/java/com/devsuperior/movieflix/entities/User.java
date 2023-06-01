@@ -55,6 +55,12 @@ public class User implements UserDetails, Serializable {
 		this.password = password;
 	}
 
+	public User(User entity) {
+		id = entity.getId();
+		name = entity.getName();
+		email = entity.getEmail();
+	}
+
 	public Long getId() {
 		return id;
 	}
