@@ -1,8 +1,8 @@
 package com.devsuperior.movieflix.services;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,8 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.devsuperior.movieflix.DTO.GenreDTO;
 import com.devsuperior.movieflix.DTO.MovieDTO;
 import com.devsuperior.movieflix.DTO.MovieSimpleDTO;
-import com.devsuperior.movieflix.DTO.ReviewUserDTO;
-import com.devsuperior.movieflix.DTO.UserDTO;
+import com.devsuperior.movieflix.DTO.ReviewDTO;
 import com.devsuperior.movieflix.entities.Genre;
 import com.devsuperior.movieflix.entities.Movie;
 import com.devsuperior.movieflix.entities.Review;
@@ -60,17 +59,12 @@ public class MovieService{
 	}
 
 	@Transactional(readOnly = true)
-	public List<ReviewUserDTO> findReviews(Long movieId){
+	public List<ReviewDTO> findReviews(Long movieId){
 		Movie movie = ( movieId == 0 ) ? null : repository.getOne(movieId); 
 		List<Review> list = reviewRepository.find(movie);
-		List<ReviewUserDTO> listDTO = new ArrayList<>(); 
 		
-		for (Review l: list) {
-			ReviewUserDTO reviewUserDTO = new ReviewUserDTO( l, new UserDTO( l.getUser() ) );	
-            listDTO.add(reviewUserDTO);			
-		}
+		return list.stream().map(x -> new ReviewDTO(x)).collect(Collectors.toList());
 		
-		return listDTO;
 	}
 	
 }

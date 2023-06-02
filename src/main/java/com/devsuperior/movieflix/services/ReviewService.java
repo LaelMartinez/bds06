@@ -17,27 +17,27 @@ import com.devsuperior.movieflix.repositories.ReviewRepository;
 import com.devsuperior.movieflix.services.exceptions.ResourceNotFoundException;
 
 @Service
-public class ReviewService{
+public class ReviewService {
 
 	@Autowired
 	private ReviewRepository repository;
 
 	@Autowired
 	private MovieRepository movieRepository;
-	
+
 	@Autowired
 	private AuthService authService;
-	
-	@Transactional(readOnly = true)
-	public List<ReviewDTO> findAll(){
-		List<Review> list = repository.findAll();
-		return list.stream().map(x -> new ReviewDTO(x) ).collect(Collectors.toList());
-	}	
 
-	@Transactional
+	@Transactional(readOnly = true)
+	public List<ReviewDTO> findAll() {
+		List<Review> list = repository.findAll();
+		return list.stream().map(x -> new ReviewDTO(x)).collect(Collectors.toList());
+	}
+
+	@Transactional(readOnly = true)
 	public ReviewDTO insert(ReviewDTO dto) {
 		User user = authService.authenticated();
-		
+
 		try {
 			Review entity = new Review();
 			entity.setMovie(movieRepository.getOne(dto.getMovieId()));
@@ -45,9 +45,9 @@ public class ReviewService{
 			entity.setText(dto.getText());
 			repository.save(entity);
 			return new ReviewDTO(entity);
-		}
-		catch(EntityNotFoundException e ) {
+		} catch (EntityNotFoundException e) {
 			throw new ResourceNotFoundException("Id not found " + dto.getMovieId());
 		}
+
 	}
 }
